@@ -24,7 +24,7 @@ class Matrix(object):
 
     @staticmethod
     def mover(x,y,z):
-        m = Matrix.ident()
+        m = Matrix.ident(4)
         m[3][0] = x
         m[3][1] = y
         m[3][2] = z
@@ -32,7 +32,7 @@ class Matrix(object):
 
     @staticmethod
     def scaler(x,y,z):
-        m = Matrix.ident()
+        m = Matrix.ident(4)
         m[0][0] = x
         m[1][1] = y
         m[2][2] = z
@@ -40,7 +40,7 @@ class Matrix(object):
 
     @staticmethod
     def rotx(a):
-        m = Matrix.ident()
+        m = Matrix.ident(4)
         m[1][1] = math.cos(a)
         m[1][2] = math.sin(a)
         m[2][1] = -math.sin(a)
@@ -49,7 +49,7 @@ class Matrix(object):
     
     @staticmethod
     def roty(a):
-        m = Matrix.ident()
+        m = Matrix.ident(4)
         m[2][2] = math.cos(a)
         m[2][0] = math.sin(a)
         m[0][2] = -math.sin(a)
@@ -58,13 +58,30 @@ class Matrix(object):
     
     @staticmethod
     def rotz(a):
-        m = Matrix.ident()
+        m = Matrix.ident(4)
         m[0][0] = math.cos(a)
         m[0][1] = math.sin(a)
         m[1][0] = -math.sin(a)
         m[1][1] = math.cos(a)
         return m
-        
+
+    @staticmethod
+    def bezier():
+        m = Matrix(4,4)
+        m[0] = [-1, 3,-3, 1]
+        m[1] = [ 3,-6, 3, 0]
+        m[2] = [-3, 3, 0, 0]
+        m[3] = [ 1, 0, 0, 0]
+        return m
+
+    @staticmethod
+    def hermite():
+        m = Matrix(4,4)
+        m[0] = [ 2,-3, 0, 1]
+        m[1] = [-2, 3, 0, 0]
+        m[2] = [ 1,-2, 1, 0]
+        m[3] = [ 1,-1, 0, 0]
+        return m
     
     def __init__(self, rows = 4, cols = 4):
         self.matrix = []
@@ -119,5 +136,8 @@ class Matrix(object):
         self[-1].append(1)
         self.cols += 1
 
+    def add_circle( self, cx, cy, cz, r, step ):
+        return
+        m = Matrix(4,0)
 
 

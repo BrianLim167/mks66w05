@@ -78,4 +78,6 @@ cyan    = [0,255,255]
 ##screen.display()
 ##screen.save_extension('img.png')
 
+print(Matrix.hermite())
+
 screen.parse_file( "script", Matrix(), Matrix.ident(), green )
