@@ -139,5 +139,11 @@ class Matrix(object):
     def add_circle( self, cx, cy, cz, r, step ):
         return
         m = Matrix(4,0)
+        for i in range(step):
+            a = math.radians(360*i/step)
+            m.add_point(cx + r*math.cos(a), cy + r*math.sin(a), cz)
+            a = math.radians(360*(i+1)/step)
+            m.add_point(cx + r*math.cos(a), cy + r*math.sin(a), cz)
+        self.cat(m)
 
 
