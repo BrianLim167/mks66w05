@@ -6,10 +6,10 @@ class Matrix(object):
     #m1 * m2 -> m2
     @staticmethod
     def mult( m1, m2 ):
-        m = Matrix(m1.rows, m2.cols)
-        for c in range( m.cols ):
+        m = Matrix(0, m1.rows)
+        for c in range( m2.cols ):
             m.append([])
-            for r in range( m.rows ):
+            for r in range( m1.rows ):
                 m[-1].append( 0 )
                 for i in range(m1.cols):
                     m[c][r] += (m1[i][r] * m2[c][i])
@@ -19,7 +19,7 @@ class Matrix(object):
     def ident(s=4):
         m = Matrix(s,s)
         for c in range( m.cols ):
-            m.matrix[c][c] = 1
+            m[c][c] = 1
         return m
 
     @staticmethod
@@ -83,10 +83,15 @@ class Matrix(object):
         m[3] = [ 1,-1, 0, 0]
         return m
     
-    def __init__(self, rows = 4, cols = 4):
-        self.matrix = []
+    def __init__(self, cols = 4, rows = 4):
+        if ( isinstance(cols, list) ):
+            self.ary = cols
+            self.cols = len(cols)
+            self.rows = len(cols[0])
+            return
+        self.ary = []
         self.rows = rows
-        self.cols = cols
+        self.cols = 0
         for c in range( cols ):
             self.append( [] )
             for r in range( rows ):
@@ -100,26 +105,32 @@ class Matrix(object):
         return self
 
     def __getitem__(self, i):
-        return self.matrix[i]
+        return self.ary[i]
 
     def __setitem__(self, i, val):
-        self.matrix[i] = val
-        return self.matrix[i]
+        self.ary[i] = val
+        return self.ary[i]
 
     def __len__(self):
-        return len(self.matrix)
+        return len(self.ary)
 
     def __str__(self):
         s = ""
         for r in range(self.rows):
             for c in range(self.cols):
-                s += ("     "+str(self.matrix[c][r]))[:10][-5:]
+                s += ("     "+str(self[c][r]))[:10][-5:]
                 s += ' '
             s += '\n'
         return s
 
     def append(self, val):
-        self.matrix.append(val)
+        if ( isinstance(val, list) ):
+            self.ary.append(val)
+            self.cols += 1
+            return
+        if ( isinstance(val, Matrix) ):
+            for c in range(val.cols):
+                self.append(val[c])
 
     def print( self ):
         print(self)
@@ -129,21 +140,35 @@ class Matrix(object):
         self.add_point(x1,y1,z1)
 
     def add_point( self, x, y, z=0 ):
-        self.append([])
-        self[-1].append(x)
-        self[-1].append(y)
-        self[-1].append(z)
-        self[-1].append(1)
-        self.cols += 1
+        self.append([x,y,z,1])
 
-    def add_circle( self, cx, cy, cz, r, step ):
-        return
-        m = Matrix(4,0)
-        for i in range(step):
-            a = math.radians(360*i/step)
+    def add_circle( self, cx, cy, cz, r, step=0.001 ):
+        t = 0
+        m = Matrix(0,4)
+        while ( t <= 1 ):
+            a = math.radians(360*t)
             m.add_point(cx + r*math.cos(a), cy + r*math.sin(a), cz)
-            a = math.radians(360*(i+1)/step)
+            a = math.radians(360*(t+step))
             m.add_point(cx + r*math.cos(a), cy + r*math.sin(a), cz)
-        self.cat(m)
+            t += step
+        self.append(m)
 
-
+    def add_curve( self, x0, y0, x1, y1, x2, y2, x3, y3, step, curve_type ):
+        if ( curve_type.lower() == "bezier" ):
+            curve_type = Matrix.bezier
+        elif ( curve_type.lower() == "hermite" ):
+            curve_type = Matrix.hermite
+        x_coeff = curve_type() * Matrix([[x0,x1,x2,x3]])
+        y_coeff = curve_type() * Matrix([[y0,y1,y2,y3]])
+        t = 0
+        m = Matrix(0,4)
+        while ( t <= 1 ):
+            x = x_coeff[0][0]*t**3 + x_coeff[0][1]*t**2 + x_coeff[0][2]*t + x_coeff[0][3]
+            y = y_coeff[0][0]*t**3 + y_coeff[0][1]*t**2 + y_coeff[0][2]*t + y_coeff[0][3]
+            m.add_point(x,y,0)
+            x = x_coeff[0][0]*(t+step)**3 + x_coeff[0][1]*(t+step)**2 + x_coeff[0][2]*(t+step) + x_coeff[0][3]
+            y = y_coeff[0][0]*(t+step)**3 + y_coeff[0][1]*(t+step)**2 + y_coeff[0][2]*(t+step) + y_coeff[0][3]
+            m.add_point(x,y,0)
+            t += step
+        self.append(m)
+        

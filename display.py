@@ -142,6 +142,7 @@ class PPMGrid(object):
                             
     ############################################################################
     # transform
+    # curves
     ############################################################################
     def parse_file( self, fname, points, transform, color ):
         fopen = open(fname,'r')
@@ -183,10 +184,14 @@ class PPMGrid(object):
                 self = PPMGrid(self.width, self.height)
             elif ( cmd[i] == "quit" ):
                 return
-                            
-    ############################################################################
-    # curves
-    ############################################################################
-    
+            elif ( cmd[i] == "circle" ):
+                e.add_circle(float(args[0]),float(args[1]),float(args[2]),
+                             float(args[3]))
+            elif ( cmd[i] == "bezier" or cmd[i] == "hermite" ):
+                e.add_curve(float(args[0]),float(args[1]),
+                            float(args[2]),float(args[3]),
+                            float(args[4]),float(args[5]),
+                            float(args[6]),float(args[7]),
+                            0.001,cmd[i])
         
 
